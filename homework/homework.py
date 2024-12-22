@@ -207,20 +207,19 @@ grid_search.fit(X_train, y_train)
 print("Mejores parámetros:", grid_search.best_params_)
 
 
-import os
-import gzip
 import joblib
+import gzip
+import os
 
-# Definir el directorio y el archivo de salida
+# Directorio y archivo del modelo
 output_dir = '../files/models/'
 output_file = os.path.join(output_dir, 'model.pkl.gz')
 
-# Crear el directorio si no existe
-os.makedirs(output_dir, exist_ok=True)
+# Cargar el modelo entrenado
+with gzip.open(output_file, 'rb') as f:
+    model = joblib.load(f)
 
-# Guardar el modelo entrenado
-with gzip.open(output_file, 'wb') as f:
-    joblib.dump(grid_search.best_estimator_, f)
+
 
 import json
 from sklearn.metrics import precision_score, balanced_accuracy_score, recall_score, f1_score
@@ -272,40 +271,6 @@ with open(output_metrics_file, 'w') as f:
 
 print(f"Métricas guardadas en: {output_metrics_file}")
 
-import json
-from sklearn.metrics import precision_score, balanced_accuracy_score, recall_score, f1_score, confusion_matrix
-import os
-import gzip
-import joblib
-
-# Cargar el modelo guardado
-output_dir = '../files/models/'
-output_file = os.path.join(output_dir, 'model.pkl.gz')
-
-with gzip.open(output_file, 'rb') as f:
-    best_model = joblib.load(f)
-
-# Predicciones para entrenamiento y prueba
-y_train_pred = best_model.predict(X_train)
-y_test_pred = best_model.predict(X_test)
-
-# Cálculo de las métricas para el conjunto de entrenamiento
-metrics_train = {
-    'dataset': 'train',
-    'precision': precision_score(y_train, y_train_pred),
-    'balanced_accuracy': balanced_accuracy_score(y_train, y_train_pred),
-    'recall': recall_score(y_train, y_train_pred),
-    'f1_score': f1_score(y_train, y_train_pred)
-}
-
-# Cálculo de las métricas para el conjunto de prueba
-metrics_test = {
-    'dataset': 'test',
-    'precision': precision_score(y_test, y_test_pred),
-    'balanced_accuracy': balanced_accuracy_score(y_test, y_test_pred),
-    'recall': recall_score(y_test, y_test_pred),
-    'f1_score': f1_score(y_test, y_test_pred)
-}
 
 import json
 from sklearn.metrics import precision_score, balanced_accuracy_score, recall_score, f1_score, confusion_matrix
@@ -374,3 +339,12 @@ with open(output_metrics_file, 'w', encoding='utf-8') as f:
         f.write(json.dumps(entry) + '\n')
 
 print(f"Métricas y matrices de confusión guardadas en: {output_metrics_file}")
+
+
+# combinacion con sobreajuste
+
+#param_grid = {
+#    'classifier__n_estimators': [100,102],
+#    'classifier__max_depth': [None,5],
+#    'classifier__max_features':  ['sqrt', 'log2'],
+#}
